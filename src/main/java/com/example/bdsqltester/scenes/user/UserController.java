@@ -58,10 +58,10 @@ public class UserController {
         menuItems.clear();
 
         String sql = """
-            SELECT m.nama_menu, m.jenis, p.harga
+            SELECT m.nama_menu, m.jenis, m.harga, c.lokasi
             FROM daftar_menu m
-            JOIN penjual_sampingan p ON m.id_penjual = p.id_penjual
-            JOIN cabang c ON c.cabang_id = p.id_penjual -- Assume same ID used for demo, fix later
+            JOIN cabang c on c.cabang_id = m.cabang_id
+
             WHERE (? IS NULL OR c.lokasi = ?)
               AND (? IS NULL OR m.jenis = ?)
         """;
