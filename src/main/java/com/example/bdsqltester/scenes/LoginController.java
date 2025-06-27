@@ -31,43 +31,41 @@ public class LoginController {
     }
 
     boolean verifyCredentials(String username, String password, String role) throws SQLException {
-        // Call the database to verify the credentials
-        // This is insecure as this stores the password in plain text.
-        // In a real application, you should hash the password and store it securely.
-
-        // Get a connection to the database
         try (Connection c = DataSourceManager.getUserConnection()) {
+            // Updated query: Join users with role table
+            String sql = """
+            SELECT u.user_id, u.password, r.jenis_user
+            FROM users u
+            JOIN role r ON u.id_role = r.id_role
+            WHERE (u.username = ? OR u.email = ?) AND r.jenis_user = ?
+        """;
 
-            // Create a prepared statement to prevent SQL injection
-            PreparedStatement stmt = c.prepareStatement("SELECT * FROM users WHERE username = ? AND role = ?");
+            PreparedStatement stmt = c.prepareStatement(sql);
             stmt.setString(1, username);
-            stmt.setString(2, role.toLowerCase());
+            stmt.setString(2, username);  // Allow login with username or email
+            stmt.setString(3, role);
 
-            System.out.println("in");
-
-            // Execute the query
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                // User found, check the password
-                String dbPassword = rs.getString("password_hash");
-
+                String dbPassword = rs.getString("password");
                 if (dbPassword.equals(password)) {
                     this.userId = rs.getInt("user_id");
-                    return true; // Credentials are valid
+                    return true;
                 }
             }
         }
 
-        // If we reach here, the credentials are invalid
         return false;
     }
 
+
     @FXML
     void initialize() {
-        selectRole.getItems().addAll("User");
-        selectRole.setValue("User");
+        selectRole.getItems().addAll("Customer", "Admin Cabang", "Admin Pusat");
+        selectRole.setValue("Customer");
     }
+
 
     @FXML
     void onLoginClick(ActionEvent event) {
