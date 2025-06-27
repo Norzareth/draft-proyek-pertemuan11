@@ -3,11 +3,14 @@ package com.example.bdsqltester.scenes.user;
 import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.datasources.DataSourceManager;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
 
@@ -168,6 +171,19 @@ public class UserController {
 
 
         }
+    }
+
+    @FXML
+    void onViewHistoryClick() {
+        try {
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("order-history-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            HelloApplication.getApplicationInstance().getPrimaryStage().setScene(scene);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     private void showError(String title, String message) {

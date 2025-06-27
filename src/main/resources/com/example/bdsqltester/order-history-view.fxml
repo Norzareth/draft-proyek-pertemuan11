@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.bdsqltester.scenes.user.OrderHistoryController"
+            prefHeight="400.0" prefWidth="600.0">
+    <TableView fx:id="orderTable" layoutX="14.0" layoutY="14.0" prefWidth="572.0" prefHeight="340.0">
+        <columns>
+            <TableColumn fx:id="colTanggal" text="Tanggal" />
+            <TableColumn fx:id="colMenu" text="Menu" />
+            <TableColumn fx:id="colStatus" text="Status" />
+            <TableColumn fx:id="colJadwal" text="Jadwal Kirim" />
+        </columns>
+    </TableView>
+
+</AnchorPane>
+
+
