@@ -1,27 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="630.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.user.UserController">
-   <children>
-      <TableView fx:id="menu_table" layoutX="32.0" layoutY="128.0" prefHeight="200.0" prefWidth="548.0">
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.bdsqltester.scenes.user.UserController"
+      spacing="15" alignment="TOP_CENTER">
+
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <HBox spacing="10">
+        <Label text="Filter by Cabang:"/>
+        <ComboBox fx:id="cabangFilter"/>
+        <Label text="Kategori:"/>
+        <ComboBox fx:id="kategoriFilter"/>
+        <Button text="Apply Filter" onAction="#onFilterClick"/>
+    </HBox>
+
+    <TableView fx:id="menuTable" prefHeight="300">
         <columns>
-          <TableColumn fx:id="menu_table_no" prefWidth="54.0" text="No" />
-            <TableColumn fx:id="menu_table_name" prefWidth="129.33334350585938" text="Menu Name" />
-            <TableColumn fx:id="menu_table_branch" prefWidth="142.0" text="Branch" />
-            <TableColumn fx:id="menu_table_description" minWidth="0.0" prefWidth="212.66665649414062" text="Description" />
+            <TableColumn text="Menu" fx:id="colMenuName"/>
+            <TableColumn text="Jenis" fx:id="colJenis"/>
+            <TableColumn text="Harga" fx:id="colHarga"/>
         </columns>
-      </TableView>
-      <ComboBox fx:id="filter" layoutX="32.0" layoutY="81.0" prefHeight="25.0" prefWidth="97.0" />
-      <Label fx:id="welcome_text" layoutX="32.0" layoutY="39.0" text="Welcome, User">
-         <font>
-            <Font size="18.0" />
-         </font>
-      </Label>
-   </children>
-</AnchorPane>
+    </TableView>
+
+    <HBox spacing="10">
+        <Label text="Jadwal Kirim:"/>
+        <DatePicker fx:id="deliveryDatePicker"/>
+        <Button text="Pesan" onAction="#onOrderClick"/>
+    </HBox>
+
+</VBox>

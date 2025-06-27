@@ -1,81 +1,122 @@
 package com.example.bdsqltester.scenes.user;
+
 import com.example.bdsqltester.datasources.DataSourceManager;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import com.example.bdsqltester.dtos.Menu;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.sql.*;
+import java.time.LocalDate;
 
 public class UserController {
-    @FXML
-    private ComboBox<String> filter;
 
-    @FXML
-    private TableView<Menu> menu_table;
-    @FXML
-    private TableColumn<Menu, String> menu_table_branch;
+    @FXML private ComboBox<String> cabangFilter;
+    @FXML private ComboBox<String> kategoriFilter;
+    @FXML private TableView<MenuItem> menuTable;
+    @FXML private TableColumn<MenuItem, String> colMenuName;
+    @FXML private TableColumn<MenuItem, String> colJenis;
+    @FXML private TableColumn<MenuItem, Integer> colHarga;
+    @FXML private DatePicker deliveryDatePicker;
 
-    @FXML
-    private TableColumn<Menu, String> menu_table_description;
-
-    @FXML
-    private TableColumn<Menu, String> menu_table_name;
-
-    @FXML
-    private TableColumn<Menu, Long> menu_table_no;
-
-    @FXML
-    private Label welcome_text;
-
-    private ObservableList<Menu> menuList = FXCollections.observableArrayList();
+    private final ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
-        // Set up the columns with the property names
-        menu_table_no.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(Long item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setText(null);
-                } else {
-                    setText(String.valueOf(getIndex() + 1)); // Row index + 1
-                }
-            }
-        });
-        menu_table_name.setCellValueFactory(new PropertyValueFactory<>("menuName"));
-        menu_table_branch.setCellValueFactory(new PropertyValueFactory<>("branchName"));
-        menu_table_description.setCellValueFactory(new PropertyValueFactory<>("description"));
+        colMenuName.setCellValueFactory(data -> data.getValue().namaMenuProperty());
+        colJenis.setCellValueFactory(data -> data.getValue().jenisProperty());
+        colHarga.setCellValueFactory(data -> data.getValue().hargaProperty().asObject());
 
-        loadMenuData(); // Call to load data
+        menuTable.setItems(menuItems);
+
+        loadFilters();
+        loadMenu(null, null);
     }
 
-    private void loadMenuData() {
-        String query = "select menu_name, description, branch_name \n" +
-                "from menus m\n" +
-                "join branches b on m.branch_id = b.branch_id"; // Adjust your table name if needed
-
-        try (Connection conn = DataSourceManager.getUserConnection();
-             PreparedStatement stmt = conn.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                Menu menu = new Menu(rs);
-                menuList.add(menu);
+    private void loadFilters() {
+        try (Connection c = DataSourceManager.getUserConnection()) {
+            // Cabang
+            Statement stmt = c.createStatement();
+            ResultSet rsCabang = stmt.executeQuery("SELECT lokasi FROM cabang");
+            while (rsCabang.next()) {
+                cabangFilter.getItems().add(rsCabang.getString("lokasi"));
             }
 
-            menu_table.setItems(menuList);
+            // Kategori (jenis makanan)
+            ResultSet rsJenis = stmt.executeQuery("SELECT DISTINCT jenis FROM daftar_menu");
+            while (rsJenis.next()) {
+                kategoriFilter.getItems().add(rsJenis.getString("jenis"));
+            }
 
         } catch (SQLException e) {
-            e.printStackTrace(); // Replace with proper logging or UI alert
+            showError("Database error", e.getMessage());
         }
     }
 
+    private void loadMenu(String cabang, String kategori) {
+        menuItems.clear();
 
+        String sql = """
+            SELECT m.nama_menu, m.jenis, p.harga
+            FROM daftar_menu m
+            JOIN penjual_sampingan p ON m.id_penjual = p.id_penjual
+            JOIN cabang c ON c.cabang_id = p.id_penjual -- Assume same ID used for demo, fix later
+            WHERE (? IS NULL OR c.lokasi = ?)
+              AND (? IS NULL OR m.jenis = ?)
+        """;
 
+        try (Connection c = DataSourceManager.getUserConnection()) {
+            PreparedStatement stmt = c.prepareStatement(sql);
+            stmt.setString(1, cabang);
+            stmt.setString(2, cabang);
+            stmt.setString(3, kategori);
+            stmt.setString(4, kategori);
+
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                menuItems.add(new MenuItem(
+                        rs.getString("nama_menu"),
+                        rs.getString("jenis"),
+                        rs.getInt("harga")
+                ));
+            }
+
+        } catch (SQLException e) {
+            showError("Error loading menu", e.getMessage());
+        }
+    }
+
+    @FXML
+    void onFilterClick() {
+        String cabang = cabangFilter.getValue();
+        String kategori = kategoriFilter.getValue();
+        loadMenu(cabang, kategori);
+    }
+
+    @FXML
+    void onOrderClick() {
+        MenuItem selected = menuTable.getSelectionModel().getSelectedItem();
+        LocalDate deliveryDate = deliveryDatePicker.getValue();
+
+        if (selected == null || deliveryDate == null) {
+            showError("Input Incomplete", "Select a menu item and date.");
+            return;
+        }
+
+        // TODO: insert order into pemesanan + pengiriman table
+        showInfo("Success", "Order placed for " + selected.getNamaMenu() + " on " + deliveryDate);
+    }
+
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
+        alert.setTitle(title);
+        alert.showAndWait();
+    }
+
+    private void showInfo(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK);
+        alert.setTitle(title);
+        alert.showAndWait();
+    }
 }
