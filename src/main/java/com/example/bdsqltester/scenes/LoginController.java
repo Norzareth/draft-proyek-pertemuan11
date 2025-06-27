@@ -30,79 +30,90 @@ public class LoginController {
         return userId;
     }
 
-    boolean verifyCredentials(String username, String password, String role) throws SQLException {
+    boolean verifyCredentials(String username, String password, String selectedRole) throws SQLException {
         try (Connection c = DataSourceManager.getUserConnection()) {
-            // Updated query: Join users with role table
             String sql = """
             SELECT u.user_id, u.password, r.jenis_user
             FROM users u
             JOIN role r ON u.id_role = r.id_role
-            WHERE (u.username = ? OR u.email = ?) AND r.jenis_user = ?
+            WHERE (u.username = ? OR u.email = ?)
         """;
 
             PreparedStatement stmt = c.prepareStatement(sql);
             stmt.setString(1, username);
-            stmt.setString(2, username);  // Allow login with username or email
-            stmt.setString(3, role);
+            stmt.setString(2, username);
 
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 String dbPassword = rs.getString("password");
-                if (dbPassword.equals(password)) {
+                String dbRole = rs.getString("jenis_user");
+
+                if (dbPassword.equals(password) && dbRole.equalsIgnoreCase(selectedRole)) {
                     this.userId = rs.getInt("user_id");
+                    System.out.println("Login success as " + dbRole);
                     return true;
+                } else {
+                    System.out.println("Role mismatch or wrong password.");
                 }
             }
         }
-
         return false;
     }
+
 
 
     @FXML
     void initialize() {
         selectRole.getItems().addAll("Customer", "Admin Cabang", "Admin Pusat");
-        selectRole.setValue("Customer");
+        selectRole.setValue("Customer"); // default value
     }
-
 
     @FXML
     void onLoginClick(ActionEvent event) {
-        // Get the username and password from the text fields
         String username = usernameField.getText();
         String password = passwordField.getText();
-        String role = selectRole.getValue();
+        String role = selectRole.getValue(); // get selected role from UI
 
-        // Verify the credentials
         try {
             if (verifyCredentials(username, password, role)) {
                 HelloApplication app = HelloApplication.getApplicationInstance();
-                app.setUserId(this.userId);// Store the user_id in HelloApplication
-                app.getPrimaryStage().setTitle("User View");
+                app.setUserId(this.userId);
 
-                FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("user-view.fxml"));
+                FXMLLoader loader;
+
+                if (role.equalsIgnoreCase("Customer")) {
+                    app.getPrimaryStage().setTitle("Customer View");
+                    loader = new FXMLLoader(HelloApplication.class.getResource("user-view.fxml"));
+                } else if (role.equalsIgnoreCase("Admin Cabang")) {
+                    app.getPrimaryStage().setTitle("Branch Admin View");
+                    loader = new FXMLLoader(HelloApplication.class.getResource("branch-admin-view.fxml"));
+                } else if (role.equalsIgnoreCase("Admin Pusat")) {
+                    app.getPrimaryStage().setTitle("Central Admin View");
+                    loader = new FXMLLoader(HelloApplication.class.getResource("central-admin-view.fxml"));
+                } else {
+                    throw new RuntimeException("Unknown role: " + role);
+                }
+
                 Scene scene = new Scene(loader.load());
                 app.getPrimaryStage().setScene(scene);
                 app.getPrimaryStage().sizeToScene();
             } else {
-                // Show an error message
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Login Failed");
-                alert.setHeaderText("Invalid Credentials");
-                alert.setContentText("Please check your username and password.");
-                alert.showAndWait();
+                showError("Login Failed", "Invalid credentials or mismatched role.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Database Error");
-            alert.setHeaderText("Database Connection Failed");
-            alert.setContentText("Could not connect to the database. Please try again later.");
-            alert.showAndWait();
+            showError("Database Error", "Could not connect to the database.");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    private void showError(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
 }
