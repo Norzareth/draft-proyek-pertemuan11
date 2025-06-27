@@ -6,11 +6,14 @@ import com.example.bdsqltester.dtos.OrderHistoryItem;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -84,6 +87,21 @@ public class OrderHistoryController {
         Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
         alert.setTitle(title);
         alert.showAndWait();
+    }
+
+    @FXML
+    void onBackClick (){
+        try {
+            FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("user-view.fxml"));
+            Scene scene = new Scene(loader.load());
+            HelloApplication.getApplicationInstance().getPrimaryStage().setScene(scene);
+
+        }catch (IOException e) {
+            e.printStackTrace();
+
+        }
+
+
     }
 
 
