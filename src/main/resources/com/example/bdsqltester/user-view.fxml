@@ -13,7 +13,7 @@
         <Insets top="20" right="20" bottom="20" left="20"/>
     </padding>
 
-    <Button text="History Pemesanan" onAction="#onViewHistoryClick" />
+    <Button text="Lihat Pemesanan" onAction="#onViewHistoryClick" />
 
     <HBox spacing="10">
         <Label text="Filter by Cabang:"/>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox spacing="10.0" xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.bdsqltester.scenes.user.ReviewDialogController"
+      alignment="CENTER" prefWidth="300" prefHeight="250">
+
+    <padding>
+        <Insets top="20" bottom="20" left="20" right="20"/>
+    </padding>
+
+    <Label text="Beri Komentar:"/>
+    <TextArea fx:id="commentArea" prefRowCount="4" wrapText="true"/>
+
+    <Label text="Rating (1-5):"/>
+    <Spinner fx:id="ratingSpinner" editable="true"/>
+
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Kirim" onAction="#onSubmit"/>
+        <Button text="Batal" onAction="#onCancel"/>
+    </HBox>
+</VBox>

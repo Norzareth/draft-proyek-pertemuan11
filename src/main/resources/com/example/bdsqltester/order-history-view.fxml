@@ -12,7 +12,7 @@
             prefHeight="400.0" prefWidth="600.0">
 
     <Button text="kembali" onAction="#onBackClick" AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="10" />
-
+    <Button text="Review/Ulasan" layoutX="120" layoutY="360" onAction="#onReviewClick" />
 
     <TableView fx:id="orderTable" layoutX="14.0" layoutY="14.0" prefWidth="572.0" prefHeight="340.0">
         <columns>

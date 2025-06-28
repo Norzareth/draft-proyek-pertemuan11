@@ -12,12 +12,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class OrderHistoryController {
 
@@ -39,10 +37,35 @@ public class OrderHistoryController {
 
     }
 
+    private void openReviewDialog(int pesananId) throws IOException {
+       try {
+           FXMLLoader loader = new FXMLLoader(HelloApplication.class.getResource("review-screen.fxml"));
+           Scene scene = new Scene(loader.load());
+
+           Stage dialog = new Stage();
+           dialog.setTitle("Review/rating");
+           dialog.setScene(scene);
+           dialog.setResizable(false);
+           dialog.initOwner(HelloApplication.getApplicationInstance().getPrimaryStage());
+           dialog.show();
+
+           ReviewDialogController controller = loader.getController();
+           controller.setPesananId(pesananId);
+
+       }catch(IOException e){
+           e.printStackTrace();
+           showError("error", "error membuka ulasan");
+       }
+    }
+
+
+
+
+
     private void loadOrderHistory(){
         ObservableList<OrderHistoryItem> items = FXCollections.observableArrayList();
         String sql = """
-                select p.tanggal_pesanan, m.nama_menu, p.status, g.jadwal_kirim
+                select p.pesanan_id, p.tanggal_pesanan, m.nama_menu, p.status, g.jadwal_kirim
                 from pemesanan p
                 join pengiriman g on p.pengiriman_id = g.pengiriman_id
                 join pesanan_menu pm on p.pesanan_id = pm.pesanan_id
@@ -61,12 +84,13 @@ public class OrderHistoryController {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()){
+                int pesananId = rs.getInt("pesanan_id");
                 String tanggal = rs.getDate("tanggal_pesanan").toString();
                 String namaMenu = rs.getString("nama_menu");
                 String status = rs.getString("status");
                 String jadwal = rs.getDate("jadwal_kirim").toString();
 
-                items.add(new OrderHistoryItem(tanggal, namaMenu, status, jadwal));
+                items.add(new OrderHistoryItem(pesananId, tanggal, namaMenu, status, jadwal));
             }
 
             orderTable.setItems(items);
@@ -99,6 +123,43 @@ public class OrderHistoryController {
         }catch (IOException e) {
             e.printStackTrace();
 
+        }
+
+
+    }
+
+    @FXML
+    void onReviewClick () throws IOException {
+
+        OrderHistoryItem selected = orderTable.getSelectionModel().getSelectedItem();
+        if (selected == null){
+            showError("Tidak ada pesanan", "Pilihlah pesanan terlebih dahulu ;)");
+        }
+
+        int pesananId = selected.getPesananId();
+
+        if (isAlreadyReviewed(pesananId)){
+            showError("Sudah diulas", "Terimakasih atas ulasan anda ;)");
+
+        }
+
+        openReviewDialog(pesananId);
+
+
+
+    }
+
+
+    private boolean isAlreadyReviewed (int pesananId){
+        String sql = "select 1 from rating where pesanan_id = ?";
+
+        try (Connection conn = DataSourceManager.getUserConnection(); PreparedStatement stmt = conn.prepareStatement(sql)){
+            stmt.setInt(1, pesananId);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return true;
         }
 
 
