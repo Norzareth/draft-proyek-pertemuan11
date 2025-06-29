@@ -1,5 +1,4 @@
 package com.example.bdsqltester.scenes;
-
 import com.example.bdsqltester.HelloApplication;
 import com.example.bdsqltester.datasources.DataSourceManager;
 import javafx.event.ActionEvent;
@@ -72,9 +71,9 @@ public class LoginController {
             case "Customer":
                 return "Customer";
             case "Admin Cabang":
-                return "AdminCab";
+                return "Admin Cabang";
             case "Admin Pusat":
-                return "AdminPus";
+                return "Admin Pusat";
             default:
                 return uiRole;
         }
