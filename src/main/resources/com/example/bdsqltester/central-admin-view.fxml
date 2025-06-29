@@ -32,37 +32,16 @@
                         <TableColumn fx:id="colNamaMenu" text="Nama Menu" />
                         <TableColumn fx:id="colJenis" text="Jenis" />
                         <TableColumn fx:id="colLokasi" text="Lokasi" />
-                        <TableColumn fx:id="colHarga" text="Harga Asli" />
-                        <TableColumn fx:id="colHargaDiskon" text="Harga Diskon" />
-                        <TableColumn fx:id="colDeskripsiDiskon" text="Deskripsi Diskon" />
-                        <TableColumn fx:id="colAksiDiskon" text="Aksi Diskon" />
+                        <TableColumn fx:id="colHarga" text="Harga" />
                     </columns>
                 </TableView>
 
-                <Separator/>
-                
-                <VBox spacing="10">
-                    <Label text="Tambah/Edit Diskon" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
-                    
-                    <HBox spacing="15" alignment="CENTER_LEFT">
-                        <Label text="Pilih Menu:"/>
-                        <ComboBox fx:id="menuComboBox" promptText="Pilih menu untuk diskon" prefWidth="200"/>
-                    </HBox>
-                    
-                    <HBox spacing="15" alignment="CENTER_LEFT">
-                        <Label text="Harga Baru (Rp):"/>
-                        <TextField fx:id="hargaBaruField" promptText="Masukkan harga baru" prefWidth="150"/>
-                        <Label text="Deskripsi Diskon:"/>
-                        <TextField fx:id="deskripsiDiskonField" promptText="Contoh: Promo 50% off" prefWidth="250"/>
-                    </HBox>
-                    
-                    <HBox spacing="15" alignment="CENTER_LEFT">
-                        <Button text="Simpan Diskon" onAction="#onSaveDiskon" 
-                                style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
-                        <Button text="Batal" onAction="#onCancelDiskon" 
-                                style="-fx-background-color: #6c757d; -fx-text-fill: white;"/>
-                    </HBox>
-                </VBox>
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Label text="Tambah Diskon:"/>
+                    <TextField fx:id="diskonField" promptText="Harga Diskon (Rp)" prefWidth="150" />
+                    <TextField fx:id="syaratField" promptText="Deskripsi Diskon" prefWidth="200" />
+                    <Button text="Simpan Diskon" onAction="#onSaveDiskon" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+                </HBox>
             </VBox>
         </Tab>
 
