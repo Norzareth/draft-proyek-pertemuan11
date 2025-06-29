@@ -12,7 +12,70 @@
    
    <Label text="Admin Pusat Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
    
-   <TabPane prefHeight="600.0" prefWidth="900.0">
+   <TabPane prefHeight="600.0" prefWidth="1000.0">
+      <Tab text="Performa Cabang" closable="false">
+         <VBox spacing="10">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <Label text="Periode:" />
+               <DatePicker fx:id="performanceStartDate" promptText="Tanggal Mulai" />
+               <Label text="s/d" />
+               <DatePicker fx:id="performanceEndDate" promptText="Tanggal Akhir" />
+               <Button text="Analisis Performa" onAction="#onAnalyzeBranchPerformance" />
+               <Button text="Refresh Data" onAction="#onRefreshPerformance" />
+            </HBox>
+            
+            <TableView fx:id="performanceTable" VBox.vgrow="ALWAYS">
+               <columns>
+                  <TableColumn fx:id="colBranchName" text="Nama Cabang" prefWidth="150" />
+                  <TableColumn fx:id="colTotalOrders" text="Total Pesanan" prefWidth="120" />
+                  <TableColumn fx:id="colTotalRevenue" text="Total Pendapatan" prefWidth="150" />
+                  <TableColumn fx:id="colAvgOrderValue" text="Rata-rata Pesanan" prefWidth="150" />
+                  <TableColumn fx:id="colPerformanceScore" text="Skor Performa" prefWidth="120" />
+                  <TableColumn fx:id="colGrowthRate" text="Pertumbuhan (%)" prefWidth="120" />
+                  <TableColumn fx:id="colStatus" text="Status" prefWidth="100" />
+               </columns>
+            </TableView>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <Button text="Detail Performa" onAction="#onViewPerformanceDetail" />
+               <Button text="Export Laporan" onAction="#onExportPerformanceReport" />
+               <Button text="Grafik Performa" onAction="#onShowPerformanceChart" />
+            </HBox>
+         </VBox>
+      </Tab>
+      
+      <Tab text="Manajemen Promosi" closable="false">
+         <VBox spacing="10">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <Label text="Jenis Promosi:" />
+               <ComboBox fx:id="promotionType" prefWidth="150" />
+               <Label text="Cabang:" />
+               <ComboBox fx:id="promotionBranch" prefWidth="150" />
+               <Button text="Tambah Promosi" onAction="#onAddPromotion" />
+               <Button text="Refresh Promosi" onAction="#onRefreshPromotions" />
+            </HBox>
+            
+            <TableView fx:id="promotionTable" VBox.vgrow="ALWAYS">
+               <columns>
+                  <TableColumn fx:id="colPromotionId" text="ID Promosi" prefWidth="100" />
+                  <TableColumn fx:id="colPromotionName" text="Nama Promosi" prefWidth="200" />
+                  <TableColumn fx:id="colPromotionType" text="Jenis" prefWidth="120" />
+                  <TableColumn fx:id="colDiscountPercent" text="Diskon (%)" prefWidth="100" />
+                  <TableColumn fx:id="colMinPurchase" text="Min. Pembelian" prefWidth="150" />
+                  <TableColumn fx:id="colStartDate" text="Tanggal Mulai" prefWidth="120" />
+                  <TableColumn fx:id="colEndDate" text="Tanggal Berakhir" prefWidth="120" />
+                  <TableColumn fx:id="colStatus" text="Status" prefWidth="100" />
+               </columns>
+            </TableView>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <Button text="Edit Promosi" onAction="#onEditPromotion" />
+               <Button text="Hapus Promosi" onAction="#onDeletePromotion" />
+               <Button text="Aktifkan/Nonaktifkan" onAction="#onTogglePromotion" />
+            </HBox>
+         </VBox>
+      </Tab>
+      
       <Tab text="Manajemen Cabang" closable="false">
          <VBox spacing="10">
             <HBox spacing="10" alignment="CENTER_LEFT">
@@ -80,23 +143,6 @@
                <Button text="Export PDF" onAction="#onExportOverallPDF" />
                <Button text="Export Excel" onAction="#onExportOverallExcel" />
                <Button text="Kirim Email" onAction="#onSendEmailReport" />
-            </HBox>
-         </VBox>
-      </Tab>
-      
-      <Tab text="Analisis Performa" closable="false">
-         <VBox spacing="10">
-            <HBox spacing="10" alignment="CENTER_LEFT">
-               <Label text="Metrik:" />
-               <ComboBox fx:id="performanceMetric" prefWidth="150" />
-               <Button text="Analisis" onAction="#onAnalyzePerformance" />
-            </HBox>
-            
-            <TextArea fx:id="analysisArea" prefHeight="400" editable="false" />
-            
-            <HBox spacing="10" alignment="CENTER_LEFT">
-               <Button text="Grafik Performa" onAction="#onShowPerformanceChart" />
-               <Button text="Rekomendasi" onAction="#onShowRecommendations" />
             </HBox>
          </VBox>
       </Tab>

@@ -13,7 +13,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class BranchAdminController {
 
@@ -24,14 +23,18 @@ public class BranchAdminController {
     @FXML private TableColumn<MenuData, String> colMenuType;
     @FXML private TableColumn<MenuData, Integer> colMenuPrice;
     @FXML private TableColumn<MenuData, String> colMenuSeller;
+    @FXML private TableColumn<MenuData, Integer> colStock;
+    @FXML private TableColumn<MenuData, String> colStatus;
     
     @FXML private ComboBox<String> statusFilter;
+    @FXML private DatePicker orderDateFilter;
     @FXML private TableView<OrderData> orderTable;
     @FXML private TableColumn<OrderData, Integer> colOrderId;
     @FXML private TableColumn<OrderData, String> colOrderDate;
     @FXML private TableColumn<OrderData, String> colOrderStatus;
     @FXML private TableColumn<OrderData, String> colCustomerName;
     @FXML private TableColumn<OrderData, String> colDeliveryStatus;
+    @FXML private TableColumn<OrderData, String> colDeliveryDate;
     @FXML private TableColumn<OrderData, Integer> colTotalAmount;
     
     @FXML private DatePicker startDate;
@@ -51,6 +54,9 @@ public class BranchAdminController {
         // Set default dates
         startDate.setValue(LocalDate.now().minusDays(30));
         endDate.setValue(LocalDate.now());
+        orderDateFilter.setValue(LocalDate.now());
+        
+        showInfo("Info", "Admin Cabang Dashboard berhasil dimuat!");
     }
     
     private void setupMenuTable() {
@@ -59,6 +65,8 @@ public class BranchAdminController {
         colMenuType.setCellValueFactory(new PropertyValueFactory<>("jenis"));
         colMenuPrice.setCellValueFactory(new PropertyValueFactory<>("harga"));
         colMenuSeller.setCellValueFactory(new PropertyValueFactory<>("namaPenjual"));
+        colStock.setCellValueFactory(new PropertyValueFactory<>("stok"));
+        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         
         menuTable.setItems(menuItems);
     }
@@ -69,6 +77,7 @@ public class BranchAdminController {
         colOrderStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colCustomerName.setCellValueFactory(new PropertyValueFactory<>("customerName"));
         colDeliveryStatus.setCellValueFactory(new PropertyValueFactory<>("statusPengiriman"));
+        colDeliveryDate.setCellValueFactory(new PropertyValueFactory<>("jadwalKirim"));
         colTotalAmount.setCellValueFactory(new PropertyValueFactory<>("totalAmount"));
         
         orderTable.setItems(orderItems);
@@ -105,15 +114,27 @@ public class BranchAdminController {
         }
     }
     
+    @FXML
+    void onUpdateStock() {
+        onRefreshMenu();
+        showInfo("Info", "Stok berhasil diupdate");
+    }
+    
     private void loadMenuData(String cabang) {
         menuItems.clear();
         
         try (Connection c = DataSourceManager.getUserConnection()) {
             String sql = """
-                SELECT m.id_menu, m.nama_menu, m.jenis, m.harga, p.nama_penjual
+                SELECT m.id_menu, m.nama_menu, m.jenis, m.harga, p.nama_penjual,
+                       COALESCE(s.stok_harian, 0) as stok_harian,
+                       CASE 
+                           WHEN COALESCE(s.stok_harian, 0) > 0 THEN 'Tersedia'
+                           ELSE 'Habis'
+                       END as status
                 FROM daftar_menu m
                 JOIN penjual_sampingan p ON m.id_penjual = p.id_penjual
                 JOIN cabang c ON m.cabang_id = c.cabang_id
+                LEFT JOIN stok_harian s ON m.id_menu = s.id_menu AND s.tanggal = CURRENT_DATE
                 WHERE c.lokasi = ?
                 ORDER BY m.nama_menu
                 """;
@@ -128,7 +149,9 @@ public class BranchAdminController {
                     rs.getString("nama_menu"),
                     rs.getString("jenis"),
                     rs.getInt("harga"),
-                    rs.getString("nama_penjual")
+                    rs.getString("nama_penjual"),
+                    rs.getInt("stok_harian"),
+                    rs.getString("status")
                 ));
             }
         } catch (SQLException e) {
@@ -138,7 +161,6 @@ public class BranchAdminController {
     
     @FXML
     void onAddMenu() {
-        // TODO: Implement add menu dialog
         showInfo("Info", "Fitur tambah menu akan diimplementasikan");
     }
     
@@ -149,7 +171,6 @@ public class BranchAdminController {
             showError("Error", "Pilih menu yang akan diedit");
             return;
         }
-        // TODO: Implement edit menu dialog
         showInfo("Info", "Fitur edit menu akan diimplementasikan");
     }
     
@@ -173,6 +194,54 @@ public class BranchAdminController {
         });
     }
     
+    @FXML
+    void onSetStock() {
+        MenuData selected = menuTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Error", "Pilih menu yang akan diatur stoknya");
+            return;
+        }
+        
+        TextInputDialog dialog = new TextInputDialog(String.valueOf(selected.getStok()));
+        dialog.setTitle("Set Stok Harian");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Masukkan jumlah stok untuk menu '" + selected.getNamaMenu() + "':");
+        
+        dialog.showAndWait().ifPresent(stockStr -> {
+            try {
+                int stock = Integer.parseInt(stockStr);
+                setMenuStock(selected.getIdMenu(), stock);
+            } catch (NumberFormatException e) {
+                showError("Error", "Masukkan angka yang valid");
+            }
+        });
+    }
+    
+    private void setMenuStock(int menuId, int stock) {
+        try (Connection c = DataSourceManager.getUserConnection()) {
+            String sql = """
+                INSERT INTO stok_harian (id_menu, tanggal, stok_harian)
+                VALUES (?, CURRENT_DATE, ?)
+                ON CONFLICT (id_menu, tanggal) 
+                DO UPDATE SET stok_harian = EXCLUDED.stok_harian
+                """;
+            
+            PreparedStatement stmt = c.prepareStatement(sql);
+            stmt.setInt(1, menuId);
+            stmt.setInt(2, stock);
+            
+            int affected = stmt.executeUpdate();
+            if (affected > 0) {
+                showInfo("Sukses", "Stok berhasil diatur");
+                onRefreshMenu();
+            } else {
+                showError("Error", "Gagal mengatur stok");
+            }
+        } catch (SQLException e) {
+            showError("Database Error", "Gagal mengatur stok: " + e.getMessage());
+        }
+    }
+    
     private void deleteMenu(int menuId) {
         try (Connection c = DataSourceManager.getUserConnection()) {
             String sql = "DELETE FROM daftar_menu WHERE id_menu = ?";
@@ -194,16 +263,17 @@ public class BranchAdminController {
     @FXML
     void onRefreshOrders() {
         String selectedStatus = statusFilter.getValue();
-        loadOrderData(selectedStatus);
+        LocalDate selectedDate = orderDateFilter.getValue();
+        loadOrderData(selectedStatus, selectedDate);
     }
     
-    private void loadOrderData(String status) {
+    private void loadOrderData(String status, LocalDate date) {
         orderItems.clear();
         
         try (Connection c = DataSourceManager.getUserConnection()) {
             String sql = """
                 SELECT p.pesanan_id, p.tanggal_pesanan, p.status, 
-                       u.username as customer_name, pg.status_pengiriman,
+                       u.username as customer_name, pg.status_pengiriman, pg.jadwal_kirim,
                        COALESCE(SUM(dm.harga), 0) as total_amount
                 FROM pemesanan p
                 JOIN users u ON p.user_id = u.user_id
@@ -211,13 +281,16 @@ public class BranchAdminController {
                 LEFT JOIN pesanan_menu pm ON p.pesanan_id = pm.pesanan_id
                 LEFT JOIN daftar_menu dm ON pm.id_menu = dm.id_menu
                 WHERE (? = 'Semua' OR p.status = ?)
-                GROUP BY p.pesanan_id, p.tanggal_pesanan, p.status, u.username, pg.status_pengiriman
+                  AND (? IS NULL OR p.tanggal_pesanan = ?)
+                GROUP BY p.pesanan_id, p.tanggal_pesanan, p.status, u.username, pg.status_pengiriman, pg.jadwal_kirim
                 ORDER BY p.tanggal_pesanan DESC
                 """;
             
             PreparedStatement stmt = c.prepareStatement(sql);
             stmt.setString(1, status);
             stmt.setString(2, status.equals("Semua") ? "" : status);
+            stmt.setDate(3, date != null ? Date.valueOf(date) : null);
+            stmt.setDate(4, date != null ? Date.valueOf(date) : null);
             ResultSet rs = stmt.executeQuery();
             
             while (rs.next()) {
@@ -227,6 +300,7 @@ public class BranchAdminController {
                     rs.getString("status"),
                     rs.getString("customer_name"),
                     rs.getString("status_pengiriman"),
+                    rs.getDate("jadwal_kirim") != null ? rs.getDate("jadwal_kirim").toString() : "",
                     rs.getInt("total_amount")
                 ));
             }
@@ -236,14 +310,115 @@ public class BranchAdminController {
     }
     
     @FXML
+    void onProcessOrder() {
+        OrderData selected = orderTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Error", "Pilih pesanan yang akan diproses");
+            return;
+        }
+        
+        if (!"Belum Diproses".equals(selected.getStatus())) {
+            showError("Error", "Hanya pesanan dengan status 'Belum Diproses' yang dapat diproses");
+            return;
+        }
+        
+        updateOrderStatus(selected.getPesananId(), "Dalam Proses");
+    }
+    
+    @FXML
     void onUpdateOrderStatus() {
         OrderData selected = orderTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showError("Error", "Pilih pesanan yang akan diupdate");
             return;
         }
-        // TODO: Implement status update dialog
-        showInfo("Info", "Fitur update status akan diimplementasikan");
+        
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(selected.getStatus());
+        dialog.setTitle("Update Status Pesanan");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Pilih status baru:");
+        dialog.getItems().addAll("Belum Diproses", "Dalam Proses", "Selesai");
+        
+        dialog.showAndWait().ifPresent(newStatus -> {
+            updateOrderStatus(selected.getPesananId(), newStatus);
+        });
+    }
+    
+    @FXML
+    void onScheduleDelivery() {
+        OrderData selected = orderTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showError("Error", "Pilih pesanan yang akan dijadwalkan pengirimannya");
+            return;
+        }
+        
+        // Create date picker dialog
+        Dialog<LocalDate> dialog = new Dialog<>();
+        dialog.setTitle("Jadwalkan Pengiriman");
+        dialog.setHeaderText(null);
+        
+        DatePicker datePicker = new DatePicker();
+        datePicker.setValue(LocalDate.now().plusDays(1));
+        
+        dialog.getDialogPane().setContent(datePicker);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+        
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == ButtonType.OK) {
+                return datePicker.getValue();
+            }
+            return null;
+        });
+        
+        dialog.showAndWait().ifPresent(deliveryDate -> {
+            scheduleDelivery(selected.getPesananId(), deliveryDate);
+        });
+    }
+    
+    private void scheduleDelivery(int pesananId, LocalDate deliveryDate) {
+        try (Connection c = DataSourceManager.getUserConnection()) {
+            String sql = """
+                UPDATE pengiriman 
+                SET jadwal_kirim = ?, estimasi_sampai = ?, status_pengiriman = 'Dijadwalkan'
+                WHERE pengiriman_id = (
+                    SELECT pengiriman_id FROM pemesanan WHERE pesanan_id = ?
+                )
+                """;
+            
+            PreparedStatement stmt = c.prepareStatement(sql);
+            stmt.setDate(1, Date.valueOf(deliveryDate));
+            stmt.setDate(2, Date.valueOf(deliveryDate.plusDays(2)));
+            stmt.setInt(3, pesananId);
+            
+            int affected = stmt.executeUpdate();
+            if (affected > 0) {
+                showInfo("Sukses", "Pengiriman berhasil dijadwalkan untuk tanggal " + deliveryDate);
+                onRefreshOrders();
+            } else {
+                showError("Error", "Gagal menjadwalkan pengiriman");
+            }
+        } catch (SQLException e) {
+            showError("Database Error", "Gagal menjadwalkan pengiriman: " + e.getMessage());
+        }
+    }
+    
+    private void updateOrderStatus(int pesananId, String newStatus) {
+        try (Connection c = DataSourceManager.getUserConnection()) {
+            String sql = "UPDATE pemesanan SET status = ? WHERE pesanan_id = ?";
+            PreparedStatement stmt = c.prepareStatement(sql);
+            stmt.setString(1, newStatus);
+            stmt.setInt(2, pesananId);
+            
+            int affected = stmt.executeUpdate();
+            if (affected > 0) {
+                showInfo("Sukses", "Status pesanan berhasil diupdate menjadi '" + newStatus + "'");
+                onRefreshOrders();
+            } else {
+                showError("Error", "Gagal update status pesanan");
+            }
+        } catch (SQLException e) {
+            showError("Database Error", "Gagal update status pesanan: " + e.getMessage());
+        }
     }
     
     @FXML
@@ -253,7 +428,6 @@ public class BranchAdminController {
             showError("Error", "Pilih pesanan yang akan dilihat detailnya");
             return;
         }
-        // TODO: Implement order detail dialog
         showInfo("Info", "Fitur lihat detail akan diimplementasikan");
     }
     
@@ -333,13 +507,11 @@ public class BranchAdminController {
     
     @FXML
     void onExportPDF() {
-        // TODO: Implement PDF export
         showInfo("Info", "Fitur export PDF akan diimplementasikan");
     }
     
     @FXML
     void onExportExcel() {
-        // TODO: Implement Excel export
         showInfo("Info", "Fitur export Excel akan diimplementasikan");
     }
     
@@ -374,13 +546,17 @@ public class BranchAdminController {
         private final String jenis;
         private final int harga;
         private final String namaPenjual;
+        private final int stok;
+        private final String status;
         
-        public MenuData(int idMenu, String namaMenu, String jenis, int harga, String namaPenjual) {
+        public MenuData(int idMenu, String namaMenu, String jenis, int harga, String namaPenjual, int stok, String status) {
             this.idMenu = idMenu;
             this.namaMenu = namaMenu;
             this.jenis = jenis;
             this.harga = harga;
             this.namaPenjual = namaPenjual;
+            this.stok = stok;
+            this.status = status;
         }
         
         public int getIdMenu() { return idMenu; }
@@ -388,6 +564,8 @@ public class BranchAdminController {
         public String getJenis() { return jenis; }
         public int getHarga() { return harga; }
         public String getNamaPenjual() { return namaPenjual; }
+        public int getStok() { return stok; }
+        public String getStatus() { return status; }
     }
     
     public static class OrderData {
@@ -396,14 +574,16 @@ public class BranchAdminController {
         private final String status;
         private final String customerName;
         private final String statusPengiriman;
+        private final String jadwalKirim;
         private final int totalAmount;
         
-        public OrderData(int pesananId, String tanggalPesanan, String status, String customerName, String statusPengiriman, int totalAmount) {
+        public OrderData(int pesananId, String tanggalPesanan, String status, String customerName, String statusPengiriman, String jadwalKirim, int totalAmount) {
             this.pesananId = pesananId;
             this.tanggalPesanan = tanggalPesanan;
             this.status = status;
             this.customerName = customerName;
             this.statusPengiriman = statusPengiriman;
+            this.jadwalKirim = jadwalKirim;
             this.totalAmount = totalAmount;
         }
         
@@ -412,6 +592,7 @@ public class BranchAdminController {
         public String getStatus() { return status; }
         public String getCustomerName() { return customerName; }
         public String getStatusPengiriman() { return statusPengiriman; }
+        public String getJadwalKirim() { return jadwalKirim; }
         public int getTotalAmount() { return totalAmount; }
     }
 } 

@@ -16,6 +16,9 @@ module com.example.bdsqltester {
     exports com.example.bdsqltester.scenes.user;
     opens com.example.bdsqltester.scenes.user to javafx.fxml;
 
+    exports com.example.bdsqltester.scenes.admin;
+    opens com.example.bdsqltester.scenes.admin to javafx.fxml;
+
     exports com.example.bdsqltester.dtos;
     opens com.example.bdsqltester.dtos to javafx.base;
 }
