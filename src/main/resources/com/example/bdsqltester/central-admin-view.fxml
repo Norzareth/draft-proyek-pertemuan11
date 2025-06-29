@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.admin.CentralAdminController">
+   <padding>
+      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+   </padding>
+   
+   <Label text="Admin Pusat Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
+   
+   <TabPane prefHeight="600.0" prefWidth="900.0">
+      <Tab text="Manajemen Cabang" closable="false">
+         <VBox spacing="10">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <Button text="Tambah Cabang" onAction="#onAddBranch" />
+               <Button text="Refresh Data" onAction="#onRefreshBranches" />
+            </HBox>
+            
+            <TableView fx:id="branchTable" VBox.vgrow="ALWAYS">
+               <columns>
+                  <TableColumn fx:id="colBranchId" text="ID Cabang" prefWidth="100" />
+                  <TableColumn fx:id="colBranchLocation" text="Lokasi" prefWidth="200" />
+                  <TableColumn fx:id="colBranchPerformance" text="Performa" prefWidth="100" />
+                  <TableColumn fx:id="colBranchIncome" text="Income" prefWidth="150" />
+                  <TableColumn fx:id="colBranchStaff" text="Jumlah Staff" prefWidth="120" />
+               </columns>
+            </TableView>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <Button text="Edit Cabang" onAction="#onEditBranch" />
+               <Button text="Hapus Cabang" onAction="#onDeleteBranch" />
+               <Button text="Lihat Detail" onAction="#onViewBranchDetail" />
+            </HBox>
+         </VBox>
+      </Tab>
+      
+      <Tab text="Manajemen Staff" closable="false">
+         <VBox spacing="10">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <Label text="Cabang:" />
+               <ComboBox fx:id="staffBranchFilter" prefWidth="200" />
+               <Button text="Tambah Staff" onAction="#onAddStaff" />
+               <Button text="Refresh Staff" onAction="#onRefreshStaff" />
+            </HBox>
+            
+            <TableView fx:id="staffTable" VBox.vgrow="ALWAYS">
+               <columns>
+                  <TableColumn fx:id="colStaffId" text="ID Staff" prefWidth="80" />
+                  <TableColumn fx:id="colStaffName" text="Nama" prefWidth="200" />
+                  <TableColumn fx:id="colStaffJob" text="Job Description" prefWidth="150" />
+                  <TableColumn fx:id="colStaffBranch" text="Cabang" prefWidth="150" />
+               </columns>
+            </TableView>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <Button text="Edit Staff" onAction="#onEditStaff" />
+               <Button text="Hapus Staff" onAction="#onDeleteStaff" />
+            </HBox>
+         </VBox>
+      </Tab>
+      
+      <Tab text="Laporan Keseluruhan" closable="false">
+         <VBox spacing="10">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <Label text="Periode:" />
+               <DatePicker fx:id="reportStartDate" promptText="Tanggal Mulai" />
+               <Label text="s/d" />
+               <DatePicker fx:id="reportEndDate" promptText="Tanggal Akhir" />
+               <ComboBox fx:id="reportType" prefWidth="150" />
+               <Button text="Generate Laporan" onAction="#onGenerateOverallReport" />
+            </HBox>
+            
+            <TextArea fx:id="overallReportArea" prefHeight="400" editable="false" />
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <Button text="Export PDF" onAction="#onExportOverallPDF" />
+               <Button text="Export Excel" onAction="#onExportOverallExcel" />
+               <Button text="Kirim Email" onAction="#onSendEmailReport" />
+            </HBox>
+         </VBox>
+      </Tab>
+      
+      <Tab text="Analisis Performa" closable="false">
+         <VBox spacing="10">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <Label text="Metrik:" />
+               <ComboBox fx:id="performanceMetric" prefWidth="150" />
+               <Button text="Analisis" onAction="#onAnalyzePerformance" />
+            </HBox>
+            
+            <TextArea fx:id="analysisArea" prefHeight="400" editable="false" />
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+               <Button text="Grafik Performa" onAction="#onShowPerformanceChart" />
+               <Button text="Rekomendasi" onAction="#onShowRecommendations" />
+            </HBox>
+         </VBox>
+      </Tab>
+   </TabPane>
+   
+   <HBox spacing="10" alignment="CENTER">
+      <Button text="Logout" onAction="#onLogout" style="-fx-background-color: #ff4444; -fx-text-fill: white;" />
+   </HBox>
+</VBox> 

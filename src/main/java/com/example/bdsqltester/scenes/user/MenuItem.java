@@ -28,3 +28,5 @@ public class MenuItem {
     public int getIdMenu(){return idMenu.get();}
     public IntegerProperty idMenuProperty(){return idMenu; }
 }
+///oiiiiiiii haloooo
+
