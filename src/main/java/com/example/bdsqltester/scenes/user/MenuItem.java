@@ -1,6 +1,7 @@
 package com.example.bdsqltester.scenes.user;
 // test justin commit
 
+
 import javafx.beans.property.*;
 
 public class MenuItem {

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.bdsqltester.scenes.admin.PerformaController"
+            prefWidth="600" prefHeight="400">
+
+    <TableView fx:id="performaTable" layoutX="20" layoutY="20" prefWidth="560" prefHeight="350">
+        <columns>
+            <TableColumn fx:id="colCabang" text="Cabang" prefWidth="200"/>
+            <TableColumn fx:id="colPerforma" text="Performa" prefWidth="180"/>
+            <TableColumn fx:id="colIncome" text="Pendapatan" prefWidth="180"/>
+        </columns>
+    </TableView>
+
+</AnchorPane>

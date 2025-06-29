@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.bdsqltester.scenes.admin.CentralAdminController"
+            prefWidth="800" prefHeight="600">
 
-<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.admin.CentralAdminController">
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
-    
-    <HBox alignment="CENTER_LEFT" spacing="10">
-        <Label text="Admin Pusat Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-        <Region HBox.hgrow="ALWAYS"/>
-        <Button text="Logout" onAction="#onLogout" style="-fx-background-color: #dc3545; -fx-text-fill: white;"/>
-    </HBox>
-    
-    <Separator/>
-    
-    <VBox spacing="20" alignment="CENTER">
-        <Label text="Selamat datang di Admin Pusat Dashboard!" style="-fx-font-size: 18px;"/>
-        <Label text="Fitur-fitur akan segera diimplementasikan." style="-fx-font-size: 14px; -fx-text-fill: gray;"/>
-    </VBox>
-</VBox> 
+    <TableView fx:id="performanceTable" layoutX="20" layoutY="20" prefWidth="760" prefHeight="300">
+        <columns>
+            <TableColumn fx:id="colNamaMenu" text="Nama Menu" />
+            <TableColumn fx:id="colJenis" text="Jenis" />
+            <TableColumn fx:id="colLokasi" text="Lokasi" />
+            <TableColumn fx:id="colHarga" text="Harga" />
+        </columns>
+    </TableView>
+
+    <Label text="Tambah Diskon" layoutX="20" layoutY="340" />
+    <TextField fx:id="diskonField" promptText="Diskon" layoutX="20" layoutY="370" prefWidth="150" />
+    <TextField fx:id="syaratField" promptText="Syarat Diskon" layoutX="190" layoutY="370" prefWidth="200" />
+    <Button text="Simpan Diskon" layoutX="410" layoutY="370" onAction="#onSaveDiskon" />
+    <Button text="Lihat Performa Cabang" layoutX="600" layoutY="500" onAction="#onLihatPerformaClick"/>
+
+
+</AnchorPane>
