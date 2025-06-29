@@ -139,11 +139,15 @@ public class OrderHistoryController {
         int pesananId = selected.getPesananId();
 
         if (isAlreadyReviewed(pesananId)){
-            showError("Sudah diulas", "Terimakasih atas ulasan anda ;)");
+            showError("Sudah diulas", "pesanan sudah diulas");
+
+        }
+        else {
+            openReviewDialog(pesananId);
+
 
         }
 
-        openReviewDialog(pesananId);
 
 
 
