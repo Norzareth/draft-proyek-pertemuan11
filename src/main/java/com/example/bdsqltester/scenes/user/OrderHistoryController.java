@@ -16,6 +16,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.sql.*;
+import java.time.LocalDate;
+import javafx.beans.property.SimpleStringProperty;
 
 public class OrderHistoryController {
 
@@ -28,10 +30,10 @@ public class OrderHistoryController {
 
     @FXML
     public void initialize (){
-        colTanggal.setCellValueFactory(data -> data.getValue().tanggalProperty());
-        colMenu.setCellValueFactory(data -> data.getValue().menuProperty());
-        colStatus.setCellValueFactory(data -> data.getValue().statusProperty());
-        colJadwal.setCellValueFactory(data -> data.getValue().jadwalProperty());
+        colTanggal.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getTanggalPesanan().toString()));
+        colMenu.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getCustomerName()));
+        colStatus.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getStatus()));
+        colJadwal.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().getJadwalKirim() != null ? data.getValue().getJadwalKirim().toString() : "N/A"));
 
         loadOrderHistory();
 
@@ -58,25 +60,25 @@ public class OrderHistoryController {
        }
     }
 
-
-
-
-
     private void loadOrderHistory(){
         ObservableList<OrderHistoryItem> items = FXCollections.observableArrayList();
         String sql = """
-                select p.pesanan_id, p.tanggal_pesanan, m.nama_menu, p.status, g.jadwal_kirim
-                from pemesanan p
-                join pengiriman g on p.pengiriman_id = g.pengiriman_id
-                join pesanan_menu pm on p.pesanan_id = pm.pesanan_id
-                join daftar_menu m on pm.id_menu = m.id_menu
-                where p.user_id = ?
-                order by p.tanggal_pesanan desc
+                SELECT p.pesanan_id, u.username as customer_name, u.email as customer_email,
+                       p.tanggal_pesanan, p.status, p.user_id,
+                       COALESCE(pg.status_pengiriman, 'Belum Dijadwalkan') as status_pengiriman,
+                       pg.jadwal_kirim, pg.estimasi_sampai, p.pengiriman_id,
+                       COALESCE(SUM(dm.harga), 0) as total_harga
+                FROM pemesanan p
+                JOIN users u ON p.user_id = u.user_id
+                LEFT JOIN pengiriman pg ON p.pengiriman_id = pg.pengiriman_id
+                LEFT JOIN pesanan_menu pm ON p.pesanan_id = pm.pesanan_id
+                LEFT JOIN daftar_menu dm ON pm.id_menu = dm.id_menu
+                GROUP BY p.pesanan_id, u.username, u.email, p.tanggal_pesanan, p.status, p.user_id,
+                         pg.status_pengiriman, pg.jadwal_kirim, pg.estimasi_sampai, p.pengiriman_id
+                ORDER BY p.tanggal_pesanan DESC
                 """;
 
-
         try (Connection conn = DataSourceManager.getUserConnection()){
-
             PreparedStatement stmt = conn.prepareStatement(sql);
 
             int userId = HelloApplication.getApplicationInstance().getUserId();
@@ -84,13 +86,20 @@ public class OrderHistoryController {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()){
-                int pesananId = rs.getInt("pesanan_id");
-                String tanggal = rs.getDate("tanggal_pesanan").toString();
-                String namaMenu = rs.getString("nama_menu");
-                String status = rs.getString("status");
-                String jadwal = rs.getDate("jadwal_kirim").toString();
-
-                items.add(new OrderHistoryItem(pesananId, tanggal, namaMenu, status, jadwal));
+                OrderHistoryItem order = new OrderHistoryItem(
+                    rs.getInt("pesanan_id"),
+                    rs.getString("customer_name"),
+                    rs.getString("customer_email"),
+                    rs.getDate("tanggal_pesanan") != null ? rs.getDate("tanggal_pesanan").toLocalDate() : null,
+                    rs.getString("status"),
+                    rs.getInt("total_harga"),
+                    rs.getInt("user_id"),
+                    rs.getString("status_pengiriman"),
+                    rs.getDate("jadwal_kirim") != null ? rs.getDate("jadwal_kirim").toLocalDate() : null,
+                    rs.getDate("estimasi_sampai") != null ? rs.getDate("estimasi_sampai").toLocalDate() : null,
+                    rs.getInt("pengiriman_id")
+                );
+                items.add(order);
             }
 
             orderTable.setItems(items);
@@ -98,13 +107,7 @@ public class OrderHistoryController {
         }catch (SQLException e){
             e.printStackTrace();
             showError("ERROR", "error history");
-
-
         }
-
-
-
-
     }
 
     private void showError(String title, String message) {
@@ -122,37 +125,26 @@ public class OrderHistoryController {
 
         }catch (IOException e) {
             e.printStackTrace();
-
         }
-
-
     }
 
     @FXML
     void onReviewClick () throws IOException {
-
         OrderHistoryItem selected = orderTable.getSelectionModel().getSelectedItem();
         if (selected == null){
             showError("Tidak ada pesanan", "Pilihlah pesanan terlebih dahulu ;)");
+            return;
         }
 
         int pesananId = selected.getPesananId();
 
         if (isAlreadyReviewed(pesananId)){
             showError("Sudah diulas", "pesanan sudah diulas");
-
         }
         else {
             openReviewDialog(pesananId);
-
-
         }
-
-
-
-
     }
-
 
     private boolean isAlreadyReviewed (int pesananId){
         String sql = "select 1 from rating where pesanan_id = ?";
@@ -165,12 +157,5 @@ public class OrderHistoryController {
             e.printStackTrace();
             return true;
         }
-
-
     }
-
-
-
-
-
 }
