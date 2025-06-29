@@ -193,18 +193,11 @@ public class UserController {
                 m.jenis, 
                 m.harga, 
                 c.lokasi,
-                COALESCE(d.persentase_diskon, 0) as persentase_diskon,
-                d.syarat_diskon,
+                COALESCE(d.harga_baru, m.harga) as harga_diskon,
                 CASE 
-                    WHEN d.persentase_diskon IS NOT NULL 
-                    THEN m.harga - (m.harga * d.persentase_diskon / 100)
-                    ELSE m.harga 
-                END as harga_diskon,
-                CASE 
-                    WHEN d.persentase_diskon IS NOT NULL 
-                    THEN 'Harga dari Rp ' || m.harga || ' menjadi Rp ' || 
-                         (m.harga - (m.harga * d.persentase_diskon / 100)) || 
-                         ', ' || COALESCE(d.syarat_diskon, 'Promo Spesial')
+                    WHEN d.harga_baru IS NOT NULL 
+                    THEN 'Harga dari Rp ' || m.harga || ' menjadi Rp ' || d.harga_baru || 
+                         ', ' || COALESCE(d.deskripsi_diskon, 'Promo Spesial')
                     ELSE ''
                 END as info_diskon
             FROM daftar_menu m
