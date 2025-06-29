@@ -11,7 +11,6 @@ public class DataSourceManager {
 
     static {
         userData = createDataSource("squire", "schoolstuff");
-
     }
 
     private static HikariDataSource createDataSource(String username, String password) {
@@ -19,12 +18,12 @@ public class DataSourceManager {
         config.setJdbcUrl("jdbc:postgresql://localhost:5432/bd_project");
         config.setUsername(username);
         config.setPassword(password);
-        /*
-        config.addDataSourceProperty("cachePrepStmts", "true");
-        config.addDataSourceProperty("prepStmtCacheSize", "250");
-        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-
-         */
+        config.setMaximumPoolSize(10);
+        config.setMinimumIdle(5);
+        config.setConnectionTimeout(30000);
+        config.setIdleTimeout(600000);
+        config.setMaxLifetime(1800000);
+        
         return new HikariDataSource(config);
     }
 
@@ -36,8 +35,4 @@ public class DataSourceManager {
 
     private DataSourceManager() {
     }
-
-
-
-
 }

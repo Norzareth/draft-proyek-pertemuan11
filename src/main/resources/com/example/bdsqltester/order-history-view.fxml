@@ -11,18 +11,25 @@
             fx:controller="com.example.bdsqltester.scenes.user.OrderHistoryController"
             prefHeight="400.0" prefWidth="600.0">
 
+    <!-- Header with Logout Button -->
+    <HBox alignment="CENTER_LEFT" spacing="10" AnchorPane.topAnchor="10" AnchorPane.leftAnchor="10" AnchorPane.rightAnchor="10">
+        <Label text="Riwayat Pesanan" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Logout" onAction="#onLogout" style="-fx-background-color: #dc3545; -fx-text-fill: white;"/>
+    </HBox>
+
     <Button text="kembali" onAction="#onBackClick" AnchorPane.bottomAnchor="10" AnchorPane.leftAnchor="10" />
     <Button text="Review/Ulasan" layoutX="120" layoutY="360" onAction="#onReviewClick" />
 
-    <TableView fx:id="orderTable" layoutX="14.0" layoutY="14.0" prefWidth="572.0" prefHeight="340.0">
+    <TableView fx:id="orderTable" layoutX="14.0" layoutY="50.0" prefWidth="572.0" prefHeight="300.0">
         <columns>
-            <TableColumn fx:id="colTanggal" text="Tanggal" />
-            <TableColumn fx:id="colMenu" text="Menu" />
-            <TableColumn fx:id="colStatus" text="Status" />
-            <TableColumn fx:id="colJadwal" text="Jadwal Kirim" />
+            <TableColumn fx:id="colTanggal" text="Tanggal" prefWidth="100"/>
+            <TableColumn fx:id="colMenu" text="Menu" prefWidth="150"/>
+            <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
+            <TableColumn fx:id="colJadwal" text="Jadwal Kirim" prefWidth="120"/>
+            <TableColumn fx:id="colDetail" text="Detail" prefWidth="100"/>
         </columns>
     </TableView>
-
 
 </AnchorPane>
 

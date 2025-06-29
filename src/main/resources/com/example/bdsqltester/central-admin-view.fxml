@@ -1,27 +1,90 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.example.bdsqltester.scenes.admin.CentralAdminController"
-            prefWidth="800" prefHeight="600">
+<?import javafx.geometry.Insets?>
 
-    <TableView fx:id="performanceTable" layoutX="20" layoutY="20" prefWidth="760" prefHeight="300">
-        <columns>
-            <TableColumn fx:id="colNamaMenu" text="Nama Menu" />
-            <TableColumn fx:id="colJenis" text="Jenis" />
-            <TableColumn fx:id="colLokasi" text="Lokasi" />
-            <TableColumn fx:id="colHarga" text="Harga" />
-        </columns>
-    </TableView>
+<VBox xmlns="http://javafx.com/javafx/21"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.bdsqltester.scenes.admin.CentralAdminController"
+      spacing="15" alignment="TOP_CENTER">
 
-    <Label text="Tambah Diskon" layoutX="20" layoutY="340" />
-    <TextField fx:id="diskonField" promptText="Diskon" layoutX="20" layoutY="370" prefWidth="150" />
-    <TextField fx:id="syaratField" promptText="Syarat Diskon" layoutX="190" layoutY="370" prefWidth="200" />
-    <Button text="Simpan Diskon" layoutX="410" layoutY="370" onAction="#onSaveDiskon" />
-    <Button text="Lihat Performa Cabang" layoutX="600" layoutY="500" onAction="#onLihatPerformaClick"/>
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
 
+    <!-- Header with Logout Button -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="Central Admin Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Logout" onAction="#onLogout" style="-fx-background-color: #dc3545; -fx-text-fill: white;"/>
+    </HBox>
 
-</AnchorPane>
+    <Separator/>
+
+    <!-- Main Content with Tabs -->
+    <TabPane VBox.vgrow="ALWAYS">
+        <!-- Menu Management Tab -->
+        <Tab text="Manajemen Menu" closable="false">
+            <VBox spacing="15">
+                <TableView fx:id="performanceTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colNamaMenu" text="Nama Menu" />
+                        <TableColumn fx:id="colJenis" text="Jenis" />
+                        <TableColumn fx:id="colLokasi" text="Lokasi" />
+                        <TableColumn fx:id="colHarga" text="Harga Asli" />
+                        <TableColumn fx:id="colHargaDiskon" text="Harga Diskon" />
+                        <TableColumn fx:id="colDeskripsiDiskon" text="Deskripsi Diskon" />
+                        <TableColumn fx:id="colAksiDiskon" text="Aksi Diskon" />
+                    </columns>
+                </TableView>
+
+                <Separator/>
+                
+                <VBox spacing="10">
+                    <Label text="Tambah/Edit Diskon" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <Label text="Pilih Menu:"/>
+                        <ComboBox fx:id="menuComboBox" promptText="Pilih menu untuk diskon" prefWidth="200"/>
+                    </HBox>
+                    
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <Label text="Harga Baru (Rp):"/>
+                        <TextField fx:id="hargaBaruField" promptText="Masukkan harga baru" prefWidth="150"/>
+                        <Label text="Deskripsi Diskon:"/>
+                        <TextField fx:id="deskripsiDiskonField" promptText="Contoh: Promo 50% off" prefWidth="250"/>
+                    </HBox>
+                    
+                    <HBox spacing="15" alignment="CENTER_LEFT">
+                        <Button text="Simpan Diskon" onAction="#onSaveDiskon" 
+                                style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+                        <Button text="Batal" onAction="#onCancelDiskon" 
+                                style="-fx-background-color: #6c757d; -fx-text-fill: white;"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </Tab>
+
+        <!-- Performance Tab -->
+        <Tab text="Performa Cabang" closable="false">
+            <VBox spacing="15">
+                <Label text="Data Performa Cabang" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                
+                <TableView fx:id="performaTable" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colCabang" text="Cabang" prefWidth="200"/>
+                        <TableColumn fx:id="colPerforma" text="Tingkat Performa" prefWidth="150"/>
+                        <TableColumn fx:id="colIncome" text="Pendapatan (Rp)" prefWidth="150"/>
+                    </columns>
+                </TableView>
+                
+                <HBox spacing="15" alignment="CENTER_RIGHT">
+                    <Button text="Refresh Data" onAction="#onRefreshPerforma" 
+                            style="-fx-background-color: #007bff; -fx-text-fill: white;"/>
+                </HBox>
+            </VBox>
+        </Tab>
+    </TabPane>
+
+</VBox>

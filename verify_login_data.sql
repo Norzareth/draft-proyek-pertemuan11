@@ -150,4 +150,38 @@ WHERE r.id_role IS NULL;
 SELECT 'Role names with length > 10:' as check_type;
 SELECT id_role, jenis_user, LENGTH(jenis_user) as name_length
 FROM role
-WHERE LENGTH(jenis_user) > 10; 
+WHERE LENGTH(jenis_user) > 10;
+
+-- Verify login data in database
+SELECT 
+    u.user_id,
+    u.username,
+    u.email,
+    u.password,
+    r.jenis_user,
+    r.jenis_akses
+FROM users u
+JOIN role r ON u.id_role = r.id_role
+ORDER BY u.user_id;
+
+-- Check if we have the required test users
+SELECT 
+    'Customer Test' as test_type,
+    COUNT(*) as count
+FROM users u
+JOIN role r ON u.id_role = r.id_role
+WHERE r.jenis_user = 'Customer' AND u.username = 'customer';
+
+SELECT 
+    'Branch Admin Test' as test_type,
+    COUNT(*) as count
+FROM users u
+JOIN role r ON u.id_role = r.id_role
+WHERE r.jenis_user = 'Admin Cabang' AND u.username = 'branchadmin';
+
+SELECT 
+    'Central Admin Test' as test_type,
+    COUNT(*) as count
+FROM users u
+JOIN role r ON u.id_role = r.id_role
+WHERE r.jenis_user = 'Admin Pusat' AND u.username = 'centraladmin';

@@ -29,4 +29,14 @@ echo 4. Should display without errors
 echo.
 
 echo Press any key to continue...
-pause >nul 
+pause >nul
+
+echo Testing Order History Fix...
+echo.
+
+echo Compiling and running the application...
+call mvn clean compile exec:java -Dexec.mainClass="com.example.bdsqltester.HelloApplication"
+
+echo.
+echo Test completed!
+pause 
