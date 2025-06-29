@@ -17,8 +17,72 @@
     
     <Separator/>
     
-    <VBox spacing="20" alignment="CENTER">
-        <Label text="Selamat datang di Admin Cabang Dashboard!" style="-fx-font-size: 18px;"/>
-        <Label text="Fitur-fitur akan segera diimplementasikan." style="-fx-font-size: 14px; -fx-text-fill: gray;"/>
-    </VBox>
+    <TabPane VBox.vgrow="ALWAYS">
+        <Tab text="Manajemen Menu &amp; Stok" closable="false">
+            <VBox spacing="15">
+                <!-- Cabang Selection -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Cabang:" style="-fx-font-weight: bold;"/>
+                    <ComboBox fx:id="cabangComboBox" prefWidth="200"/>
+                    <Button text="Refresh Menu" onAction="#onRefreshMenu" style="-fx-background-color: #007bff; -fx-text-fill: white;"/>
+                </HBox>
+                
+                <!-- Menu Table -->
+                <TableView fx:id="menuTable" VBox.vgrow="ALWAYS" prefHeight="300">
+                    <columns>
+                        <TableColumn fx:id="colMenuId" text="ID" prefWidth="50"/>
+                        <TableColumn fx:id="colMenuName" text="Nama Menu" prefWidth="200"/>
+                        <TableColumn fx:id="colMenuType" text="Jenis" prefWidth="120"/>
+                        <TableColumn fx:id="colMenuPrice" text="Harga" prefWidth="100"/>
+                        <TableColumn fx:id="colMenuSeller" text="Penjual" prefWidth="150"/>
+                        <TableColumn fx:id="colStock" text="Stok Hari Ini" prefWidth="120"/>
+                        <TableColumn fx:id="colStatus" text="Status" prefWidth="100"/>
+                    </columns>
+                </TableView>
+                
+                <!-- Table Actions -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button text="Edit Menu" onAction="#onEditMenu" style="-fx-background-color: #ffc107; -fx-text-fill: black;"/>
+                    <Button text="Hapus Menu" onAction="#onDeleteMenu" style="-fx-background-color: #dc3545; -fx-text-fill: white;"/>
+                    <Button text="Set Stok" onAction="#onSetStock" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+                </HBox>
+                
+                <Separator/>
+                
+                <!-- Add/Edit Menu Form -->
+                <VBox spacing="10">
+                    <Label text="Tambah/Edit Menu" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
+                    
+                    <GridPane hgap="10" vgap="5">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="NEVER" minWidth="100" prefWidth="120"/>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="200" prefWidth="250"/>
+                            <ColumnConstraints hgrow="NEVER" minWidth="100" prefWidth="120"/>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="200" prefWidth="250"/>
+                        </columnConstraints>
+                        
+                        <Label text="Nama Menu:" GridPane.columnIndex="0" GridPane.rowIndex="0"/>
+                        <TextField fx:id="newMenuName" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                        
+                        <Label text="Jenis:" GridPane.columnIndex="0" GridPane.rowIndex="1"/>
+                        <ComboBox fx:id="newMenuType" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        
+                        <Label text="Penjual:" GridPane.columnIndex="0" GridPane.rowIndex="2"/>
+                        <ComboBox fx:id="newMenuSeller" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                        
+                        <Label text="Harga:" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                        <TextField fx:id="newMenuPrice" GridPane.columnIndex="3" GridPane.rowIndex="0"/>
+                        
+                        <Label text="Stok Awal:" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                        <TextField fx:id="newMenuStock" GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+                    </GridPane>
+                    
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button text="Tambah Menu" onAction="#onAddMenu" style="-fx-background-color: #28a745; -fx-text-fill: white;"/>
+                        <Button text="Update Menu" onAction="#onUpdateMenu" style="-fx-background-color: #007bff; -fx-text-fill: white;"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+        </Tab>
+    </TabPane>
 </VBox> 
