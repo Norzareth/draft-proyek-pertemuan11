@@ -1,100 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.admin.BranchAdminController">
-   <padding>
-      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-   </padding>
-   
-   <Label text="Admin Cabang Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
-   
-   <TabPane prefHeight="600.0" prefWidth="900.0">
-      <Tab text="Manajemen Menu & Stok" closable="false">
-         <VBox spacing="10">
-            <HBox spacing="10" alignment="CENTER_LEFT">
-               <Label text="Cabang:" />
-               <ComboBox fx:id="cabangComboBox" prefWidth="200" />
-               <Button text="Refresh Menu" onAction="#onRefreshMenu" />
-               <Button text="Update Stok" onAction="#onUpdateStock" />
-            </HBox>
-            
-            <TableView fx:id="menuTable" VBox.vgrow="ALWAYS">
-               <columns>
-                  <TableColumn fx:id="colMenuId" text="ID Menu" prefWidth="80" />
-                  <TableColumn fx:id="colMenuName" text="Nama Menu" prefWidth="200" />
-                  <TableColumn fx:id="colMenuType" text="Jenis" prefWidth="120" />
-                  <TableColumn fx:id="colMenuPrice" text="Harga" prefWidth="100" />
-                  <TableColumn fx:id="colMenuSeller" text="Penjual" prefWidth="150" />
-                  <TableColumn fx:id="colStock" text="Stok Hari Ini" prefWidth="120" />
-                  <TableColumn fx:id="colStatus" text="Status" prefWidth="100" />
-               </columns>
-            </TableView>
-            
-            <HBox spacing="10" alignment="CENTER_LEFT">
-               <Button text="Tambah Menu" onAction="#onAddMenu" />
-               <Button text="Edit Menu" onAction="#onEditMenu" />
-               <Button text="Hapus Menu" onAction="#onDeleteMenu" />
-               <Button text="Set Stok" onAction="#onSetStock" />
-            </HBox>
-         </VBox>
-      </Tab>
-      
-      <Tab text="Pesanan & Pengiriman" closable="false">
-         <VBox spacing="10">
-            <HBox spacing="10" alignment="CENTER_LEFT">
-               <Label text="Status:" />
-               <ComboBox fx:id="statusFilter" prefWidth="150" />
-               <Label text="Tanggal:" />
-               <DatePicker fx:id="orderDateFilter" />
-               <Button text="Refresh Pesanan" onAction="#onRefreshOrders" />
-            </HBox>
-            
-            <TableView fx:id="orderTable" VBox.vgrow="ALWAYS">
-               <columns>
-                  <TableColumn fx:id="colOrderId" text="ID Pesanan" prefWidth="100" />
-                  <TableColumn fx:id="colOrderDate" text="Tanggal" prefWidth="120" />
-                  <TableColumn fx:id="colOrderStatus" text="Status" prefWidth="120" />
-                  <TableColumn fx:id="colCustomerName" text="Customer" prefWidth="150" />
-                  <TableColumn fx:id="colDeliveryStatus" text="Status Pengiriman" prefWidth="150" />
-                  <TableColumn fx:id="colDeliveryDate" text="Jadwal Kirim" prefWidth="120" />
-                  <TableColumn fx:id="colTotalAmount" text="Total" prefWidth="100" />
-               </columns>
-            </TableView>
-            
-            <HBox spacing="10" alignment="CENTER_LEFT">
-               <Button text="Proses Pesanan" onAction="#onProcessOrder" />
-               <Button text="Update Status" onAction="#onUpdateOrderStatus" />
-               <Button text="Jadwalkan Pengiriman" onAction="#onScheduleDelivery" />
-               <Button text="Lihat Detail" onAction="#onViewOrderDetail" />
-            </HBox>
-         </VBox>
-      </Tab>
-      
-      <Tab text="Laporan" closable="false">
-         <VBox spacing="10">
-            <HBox spacing="10" alignment="CENTER_LEFT">
-               <Label text="Periode:" />
-               <DatePicker fx:id="startDate" promptText="Tanggal Mulai" />
-               <Label text="s/d" />
-               <DatePicker fx:id="endDate" promptText="Tanggal Akhir" />
-               <Button text="Generate Laporan" onAction="#onGenerateReport" />
-            </HBox>
-            
-            <TextArea fx:id="reportArea" prefHeight="400" editable="false" />
-            
-            <HBox spacing="10" alignment="CENTER_LEFT">
-               <Button text="Export PDF" onAction="#onExportPDF" />
-               <Button text="Export Excel" onAction="#onExportExcel" />
-            </HBox>
-         </VBox>
-      </Tab>
-   </TabPane>
-   
-   <HBox spacing="10" alignment="CENTER">
-      <Button text="Logout" onAction="#onLogout" style="-fx-background-color: #ff4444; -fx-text-fill: white;" />
-   </HBox>
+<VBox xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.bdsqltester.scenes.admin.BranchAdminController">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+    
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <Label text="Admin Cabang Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Logout" onAction="#onLogout" style="-fx-background-color: #dc3545; -fx-text-fill: white;"/>
+    </HBox>
+    
+    <Separator/>
+    
+    <VBox spacing="20" alignment="CENTER">
+        <Label text="Selamat datang di Admin Cabang Dashboard!" style="-fx-font-size: 18px;"/>
+        <Label text="Fitur-fitur akan segera diimplementasikan." style="-fx-font-size: 14px; -fx-text-fill: gray;"/>
+    </VBox>
 </VBox> 

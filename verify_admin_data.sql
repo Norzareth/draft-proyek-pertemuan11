@@ -75,4 +75,46 @@ SELECT 'Total Cabang' as type, COUNT(*) as count
 FROM cabang
 UNION ALL
 SELECT 'Total Staff' as type, COUNT(*) as count
-FROM staff_katering; 
+FROM staff_katering;
+
+-- =====================================================
+-- VERIFY ADMIN CABANG DATA
+-- =====================================================
+
+-- Check if admin cabang roles exist
+SELECT 'ADMIN CABANG ROLES' as info;
+SELECT id_role, jenis_user, jenis_akses
+FROM role
+WHERE jenis_user = 'AdminCab';
+
+-- Check admin cabang users
+SELECT 'ADMIN CABANG USERS' as info;
+SELECT u.user_id, u.username, u.email, u.password, r.jenis_user
+FROM users u
+JOIN role r ON u.id_role = r.id_role
+WHERE r.jenis_user = 'AdminCab'
+ORDER BY u.user_id;
+
+-- Check all admin users (both cabang and pusat)
+SELECT 'ALL ADMIN USERS' as info;
+SELECT u.user_id, u.username, u.email, u.password, r.jenis_user
+FROM users u
+JOIN role r ON u.id_role = r.id_role
+WHERE r.jenis_user IN ('AdminCab', 'AdminPus')
+ORDER BY r.jenis_user, u.user_id;
+
+-- Test login query for admin cabang
+SELECT 'TEST LOGIN QUERY FOR ADMIN CABANG' as info;
+SELECT u.user_id, u.username, u.password, r.jenis_user
+FROM users u
+JOIN role r ON u.id_role = r.id_role
+WHERE (u.username = 'admin_jak' OR u.email = 'admin_jak') 
+  AND r.jenis_user = 'AdminCab';
+
+-- Count total users by role
+SELECT 'USER COUNT BY ROLE' as info;
+SELECT r.jenis_user, COUNT(*) as user_count
+FROM users u
+JOIN role r ON u.id_role = r.id_role
+GROUP BY r.jenis_user
+ORDER BY r.jenis_user; 

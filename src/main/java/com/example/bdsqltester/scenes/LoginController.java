@@ -71,9 +71,9 @@ public class LoginController {
             case "Customer":
                 return "Customer";
             case "Admin Cabang":
-                return "Admin Cabang";
+                return "AdminCab";
             case "Admin Pusat":
-                return "Admin Pusat";
+                return "AdminPus";
             default:
                 return uiRole;
         }
